@@ -204,7 +204,7 @@ Limited and specific use case: **HPC**
 
 ### Cloud is not
 
-- grid computing: Is just a collection of resources. Cloud use grid computing.
+- grid computing: Is just a collection of resources. Cloud uses grid computing.
 - utility computing: Users want to be in control of what runs on each server (more like Metal as a service). Cloud users want to neglect the infrastructure.
 
 ## -aaS MODELS
