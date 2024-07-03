@@ -95,16 +95,16 @@ Atomic ordering can follow anyway a causal and/or fifo policy. Cost for atomic o
 Simple way to implement atomic orderd for messages comiing from the outern: **one node becomes also the entry element, front end**. This solution comes with withdraws:
 
 - SPoF
-- Unfair management: outern neighbors can be favored. **Low cost but unfair.** 
+- Unfair management: outern neighbors can be favored. **Low cost but unfair.**
 
 Alternative: mobile co-ordinator with a **Cirtulating token**
 
-### synchronization 
+### synchronization
 
 synchronization: Ordering on events. Provide a consistent view of the system to the
-entire set of communicating processes. 
-Synchronization by using PHYSICAL TIME and PHYSICAL CLOCK – typical on one local environment only, **absolutely not feasible on distributed and global system**. 
-Enter UCT, universal coordinated time. NTP is the synchronization protocol able to achieve an agreement on physical clock. Uses a server hierarchy with a small numbers on level to provide clock with small errors. Still remains **hard to avoid conflicts and clock drifting with limited overhead**. 
+entire set of communicating processes.
+Synchronization by using PHYSICAL TIME and PHYSICAL CLOCK – typical on one local environment only, **absolutely not feasible on distributed and global system**.
+Enter UCT, universal coordinated time. NTP is the synchronization protocol able to achieve an agreement on physical clock. Uses a server hierarchy with a small numbers on level to provide clock with small errors. Still remains **hard to avoid conflicts and clock drifting with limited overhead**.
 
 Several Distributed Synchronization Methods: discrete time and ordering of a event subset:
 
@@ -112,10 +112,30 @@ Several Distributed Synchronization Methods: discrete time and ordering of a eve
 - Token Passing LeLann ring strategy
 - Event ordering based on priority
 
-#### Lamport
+#### Lamport relationship
 
 Only some events are considered in the distributed system.
 
-- Local 
-- Remote (send / receive events)
+- Local
+- Remote (send / receive events form one process to another)
+
+Lamport considers only _relevant_ events and aims at creating a simple ordering policy.
+
+Consider events caused by a set of processes that communicate through message passing. Lamport wants to capture the cause-effect relationship.
+
+**Heppened Before relationship**:
+
+- If a and b are events of the same process and a occurs before b, then a -> b (local order)
+- If a is the sending event in one process and b is the receiving event within another process, then a -> b (communication interprocess)
+- If a -> b and b -> c, then a -> c (transitivity)
+
+The relation -> introduce a partial ordering in some systems events and among all events, **it's not a total ordering)**. Two events are concurrent :up_arrow: :up_arrow: if **not a -> b and not b -> a**
+
+![events flow diagram](./lamport1.png)
+
+We don't assume a unique global clock (global time), but **allow for a set of local clocks (local time).**
+
+We work in an **Asynchronous environment** that makes possible high trasmission delay (very very long, but any lost messages). We need several ordering strategies, also gloabal or total to synchronize. We want **to build a logical time system based on the -> relationship**.
+
+#### Logical Clock
 
