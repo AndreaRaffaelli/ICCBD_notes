@@ -125,17 +125,30 @@ Consider events caused by a set of processes that communicate through message pa
 
 **Heppened Before relationship**:
 
-- If a and b are events of the same process and a occurs before b, then a -> b (local order)
-- If a is the sending event in one process and b is the receiving event within another process, then a -> b (communication interprocess)
-- If a -> b and b -> c, then a -> c (transitivity)
+- If a and b are events of the same process and a occurs before b, then $a \rightarrow b$ (local order)
+- If a is the sending event in one process and b is the receiving event within another process, then $a \rightarrow b$ (communication interprocess)
+- If $a \rightarrow b$ and $b \rightarrow c$, then $a \rightarrow c$ (transitivity)
 
-The relation -> introduce a partial ordering in some systems events and among all events, **it's not a total ordering)**. Two events are concurrent :up_arrow: :up_arrow: if **not a -> b and not b -> a**
+The relation -> introduce a partial ordering in some systems events and among all events, **it's not a total ordering)**. Two events are concurrent $\uparrow\uparrow$ if **not $a \rightarrow b$ and not $b \rightarrow a$**
 
 ![events flow diagram](./lamport1.png)
 
 We don't assume a unique global clock (global time), but **allow for a set of local clocks (local time).**
 
-We work in an **Asynchronous environment** that makes possible high trasmission delay (very very long, but any lost messages). We need several ordering strategies, also gloabal or total to synchronize. We want **to build a logical time system based on the -> relationship**.
+We work in an **Asynchronous environment** that makes possible high trasmission delay (very very long, but any lost messages). We need several ordering strategies, also gloabal or total to synchronize. We want **to build a logical time system based on the $\rightarrow$ relationship**.
 
 #### Logical Clock
 
+We need to build a logical clock/timestamp to assign a "number" to each event, "happened before" is only partial.
+
+Define $TS(i)$ as the timestamp of the event i:
+
+- if $a \rightarrow b$, then $TS(a) < TS(b)$. We can then define the **clock condition LC**: Given a and b, if $a \rightarrow b$ then $LC(a) < LC(b)$
+
+    > Note: It is not true that if $LC(a) < LC(b)$ then $a \rightarrow b$
+
+- For $\forall a$ and $\forall b$, if $a$ is the sending of a message in the process P_i and $b$ the reception in the process P_j, then $LC(A) < LC(b).$
+- For $\forall a$, sending of a message in a process, the message contains a clock as timestamp $TS=LC(a)$
+- For $\forall b$, reception of a message in process Pj, the process put the logical clock at the greater value between current clock and timestamp $LC_j = max( TS_r, LC_c ) + 1$ _(r received, c current)_
+
+These rules introduce partial order relationship, **many concurrent events $a \uparrow\uparrow b$ with equal timestamp.**
