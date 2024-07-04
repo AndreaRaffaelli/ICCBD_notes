@@ -347,26 +347,32 @@ Election protocol to decide who must become the manager.
 
 #### Bully algorithm
 
-Every participant Pi that detecs necessity of an election. Three types of messages are considered:
+The node with the higher priority always win the election. The nodes doesn't know how many nodes/priority there are.
 
-- message election
-- answer
-- Announcement Iamcoordinator
+Three types of messages are considered:
 
-Any participant can start the election at any time. Sends an election message to processes with high priority. Election meesage from a lower priori.
+- message `election`
+- `answer`
+- announcement `IAmCoordinator`
 
-The main part is to locally coordinateteh event of single component parts to compose a unique consiten view, but at a low cost.
+Any participant can start the election at any time.
+
+- The node sends an election message to processes looking for a node with higher priority.
+- If a process with higher priority is present answers back and stop the elections
+- The higher node starts a new election
+- If there aren't any nodes with higher priority sends an announcement `IAmCoordinator`
 
 ## Global state
 
-**Define a global state** associated with the current situation, used to replay the system from a previous point and **restart execution in a safe situation**.
-Define one way chanells between nodes.
+The main part is to locally coordinate event of single component parts to compose a unique consiten view, but at a low cost.
 
-Processes can execute locally and exchange messages via channels (no partitioning)
+**Define a global state** associated with the current situation, used to replay the system from a previous point and **restart execution in a safe situation**.
+
+Define **one way chanells between nodes**. Processes can execute locally and exchange messages via channels (the system isn't partitioned).
 
 ![gloabl state](./globalstate.png)
 
-Every arrows are input queues. The interconnection must make possible the reachability of any node from any other one (no partition) **NO PARTITIONs**.
+Every arrows are input queues. The interconnection must make possible the reachability of any node from any other one: **NO PARTITIONs**, any node can reach (via routing) any other node.
 
 ![gloabl state](./globalstate1.png)
 
@@ -374,11 +380,9 @@ Every arrows are input queues. The interconnection must make possible the reacha
 
 Compose the needed local information in a unique meaningful state but acquiring with a distributed perspective with a minimal coordination. We must grant a safe global vision in a consistent way.
 
-No partitions and any node can reach (via routing) any other node.
+#### Global states consistency
 
-#### Gloabl states consistency
-
-To store is important coordination.
+To store consistently is important coordination among nodes.
 
 All the processes can store the state in local or remotely. The store is not just your local state, but the state and context/coordination state.  
 
@@ -388,15 +392,21 @@ Consistent cuts (a) represent a safe global state and Inconsistent cuts (b) prod
 
 ![cut in state](./globalstate2.png)
 
-The channels are one way, lossless, FIFO.
+- Consistent Cut: message m3 from P1 to P2.
+  In case of the m3 message, where we included the sending state
+in the snapping of P1. We must record the arrival within the
+state of the receiving node P3 (input messages must be saved)
+- Inconsistent Cut: message m2 from P2 to P3.
+  It embeds the message in the receiver state,
+but the message has not been recorded in the sender state.
 
-#### Becoming Red
+#### Starting a cut: Becoming Red
 
-It means a node is saving the state on the disk. It sends a red message attached to the normal flow of messages. It causes a **Red wave**.  
+Becoming red: It means a node is saving the state on the disk. It sends a red message attached to the normal flow of messages. It causes a **Red wave**.  
 
 When the intiator gets a red message in input means the saving is done. **It should save every messages received before the input red message.**  
 
-If a node is not the initiator when it receives the red message in input it becomes red.
+If a node is not the initiator when it receives the red message in input it becomes red too.
 
 Two different nodes can start two different waves, it doesn’t cause ambiguity if I **tag the red messages with an id of the initiator**.
 
@@ -405,4 +415,4 @@ The global snapshot consists of all saved states by all nodes. A node stores:
 - Its internal state (checkpoint)
 - exchanged compatible messages
 
-the wave expands to cover the entire system (assumption of complete reachability).
+The wave expands to cover the entire system (assumption of complete reachability).
