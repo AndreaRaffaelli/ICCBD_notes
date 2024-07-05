@@ -400,7 +400,7 @@ state of the receiving node P3 (input messages must be saved)
   It embeds the message in the receiver state,
 but the message has not been recorded in the sender state.
 
-#### Starting a cut: Becoming Red
+#### Chandy-Lamport snapshotting
 
 Becoming red: It means a node is saving the state on the disk. It sends a red message attached to the normal flow of messages. It causes a **Red wave**.  
 
@@ -416,3 +416,45 @@ The global snapshot consists of all saved states by all nodes. A node stores:
 - exchanged compatible messages
 
 The wave expands to cover the entire system (assumption of complete reachability).
+
+#### Marker management algorithm
+
+Every process is characterized by:
+
+- in and out channels in FIFO
+- A state and a color:
+  - white - before snapshot
+  - Red - Doing/complete snapshot
+
+The marker switches the state of the process, makers are messages.
+
+Every process receiveing a a marker, or deciding a snapshot, makes a local state save and **sends markers** on every output.
+
+The marker pass through cahnnels in FIFO ordering.
+
+Every process organizes its state to save in two parts:
+
+- Local environment, stores it as soon as they become red
+- Communication, set of possible messages associated to input channels. Messages are recorded until the first marker message arrives in the queue.
+
+A process completes its snapshot after receiving a marker on every channel (different from the one where it arrived first).
+
+#### Phases
+
+- Arrives a red message form a queue. Turns red and save internal state.
+- Start recording all incoming messages from "open" input channels.
+- Sends Markers on every output
+- When it receives a marker from a channel, "closes" the recording for that channel.
+
+When a  process closes the recording for all the input channels, it has completed the node snapshot (state plus all messages saved from input channels)
+
+The global state snapshot result composed by:
+
+- local states of every process
+- state of input connec channels
+
+#### How and where are recorder all the states?
+
+Every process that ends can send the state to the process that started the snapshot or to a defined P node devoted to management collection and eventual replay.
+
+At first snapshots are inteded as rare events inside the system because of the cost.
