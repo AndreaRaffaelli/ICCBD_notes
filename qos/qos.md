@@ -208,9 +208,38 @@ With objects that can be managers themself to organize a flexible hierarchy.
 Managed object are the resources, described as objects:
 
 - simple resources (a modem)
-- comples resources (more interconnected systems)
+- complex resources (more interconnected systems)
 - can be created dynamically
 
-The managers realized management policies based on managing different agents of other managers (?). A manager can both insert a resource and remove it dynamically.
+The managers realize management policies based on managing different agents of other managers (?). A manager can both insert a resource and remove it dynamically.
 
 The agent can also execute actions on manager request.
+
+#### CMISE/P
+
+It's an advanced protocol used from telcom to manage WAN. It realizes a dynamic model at its maximal degree: it can also define new action for the agents dynamically.
+
+## Control Plane Protocol: Session Protocol
+
+SIP, session initiation protocol, is able to support and manage multimedia sessions. The goal is to define and manage a session to support a multimedia service that is provided by other protocols. SIP uses Http compatible content, text-based and purely client/server.
+
+Messages:
+
+![sip messages](./sip.png)
+
+An interaction flow: 
+
+![interaction flow](./sip2.png)
+
+There are different fucntional entities:
+
+- User agent: endpoints, client and servers. 
+- Proxy server: routers at application level, can keep state of session transactions
+- Redirect server
+- registar server: service for user registration to the infrastructure
+- Location server: service to allow link interested users to their location
+
+![sip scenario](./sip3.png)
+
+Messages are structured as: start-line, header, message body (optional). If it is a request in the startline there's the name-method, protocol version and the request URI. If it is a REPLY there's protocol version, state code, explicative phrase. the body can contain firther information on flow and service.
+
