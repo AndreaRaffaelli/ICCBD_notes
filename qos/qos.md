@@ -117,11 +117,11 @@ Granting the QoS is high cost. Dynamic data collection mechanism must require no
 
 ### OSI System management
 
-Osi distributed management: Use of **standard description of objects and actions**. 
+Osi distributed management: Use of **standard description of objects and actions**.
 
 Defines a layer 7 protocol: CMIP (Common Management Information Protocol), which is an implementation for the CMIS (Common Management Information Service), allowing communication between network management applications and management agents. [1](https://en.wikipedia.org/wiki/Common_Management_Information_Protocol)
 
-## Manager/Agent model
+## Agent/Manager model
 
 Management standard based on two roles:
 
@@ -134,4 +134,83 @@ Manager/Agents model can lead to very simple implementation.
 
 ### SNMP
 
-Snmp: Simple Network Management Protocol, standard by IETF. It uses TCP/IP, very spread in UNIX systems and LAN environments, SNMP operates on CMIP subset (incompatiblewith CMIP standards).
+Snmp: Simple Network Management Protocol, standard by IETF. It uses TCP/IP, very spread in UNIX systems and LAN environments, SNMP operates on CMIP subset (incompatiblewith CMIP standards). Since it was really simple, over the years had passed redefinitions to keep count of:
+
+- security
+- flexible management
+- existing legacy systems
+- not only devices, entities of any type
+
+SNMP uses **one manager (only one)** and **some agents** that control variables representing the objects, identified by **unique names (OID in hierarchical directories)**, stored in the MIB database.
+
+Manager requests actions `(get and set)` and receives response. Agents wait requests and can also send `trap`.
+
+![snmp model](./snmp.png)
+
+Some messages used on UDP (port 161 messages, port 162 inside manager for trap):
+
+- `Set`
+- `Get`
+- `Get_Next` (multiple attribute)
+- `Trap`
+
+![snmp messages](./snmp1.png)
+
+#### SNMP Agents
+
+Must handle requests of get and set form the manager, can generate traps when some events occur.
+![snamp agent](./snmp2.png)
+
+#### SNMP Manager
+
+Must handles respondes and traps from agents.
+
+![snmp manager](./snmp3.png)
+
+#### SNMP Standards
+
+Data description ruled by:
+
+- SMI (structure of management information), to define objects - ASN.1 and BER standard
+- MIB (management of information base), to manage direcories of objects - X.500 standard
+
+#### Proxy Agents
+
+A proxy agent is an agent and a manager. Introduced to overcome the problem called **micro management** (i.e., the congestion around manager). The proxy can collect results and send them in an aggregated form.
+
+![snmp proxies](./snmp4.png)
+
+## Network and traffic Management
+
+Snmp can deal only with variables inside the agents, the processes. To manage the network enter **Remote MONitor, RMON**, designed to give visibility on traffic.
+
+It introduces monitor agents and and the interaction protocol between manager and monitors.
+
+RMON is **oriented toward traffic and bandwidth**, not toward devices.
+
+**Probe** is an entity capable of **monitoring packets** on the network, **can work autonomously** and **also disconnected from the manager** to track subsystems and **report filtered information** to the manager.
+
+![rmon probes](./rmon.png)
+
+Enhance model of distributed management based on:
+| | |
+| - | - |
+| Active entities | Manager |
+| Managed entities | Objects |
+| Intermediate entities | Agents |
+
+With objects that can be managers themself to organize a flexible hierarchy.
+
+![rmon](./rmon1.png)
+
+### Advanced network management
+
+Managed object are the resources, described as objects:
+
+- simple resources (a modem)
+- comples resources (more interconnected systems)
+- can be created dynamically
+
+The managers realized management policies based on managing different agents of other managers (?). A manager can both insert a resource and remove it dynamically.
+
+The agent can also execute actions on manager request.
