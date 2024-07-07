@@ -284,7 +284,7 @@ Qos can be obtained by conditioning the traffic: monitoring of the traffic and t
 
 ![qos router](./routing2.png) 
 
-QoS Routers have policies for queuing and scheduling, based on packet, length or destination/source (flows). A router can a packet classifier and a functionfor traffic conditioning.
+QoS Routers have policies for queuing and scheduling, based on packet, length or destination/source (flows). A router can have a packet classifier and a function for traffic conditioning.
 
 ![traffic conditioner](./routing3.png)
 
