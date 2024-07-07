@@ -258,7 +258,7 @@ A router executes for **every packet** that is put into a **FIFO queue**
 
 ![standard router model](./routing.png)
 
-Standard router doesn't support any QoS.
+Standard routers don't support any QoS.
 
 ![internal model of a router](./routing1.png)
 
