@@ -227,13 +227,13 @@ Messages:
 
 ![sip messages](./sip.png)
 
-An interaction flow: 
+An interaction flow:
 
 ![interaction flow](./sip2.png)
 
 There are different fucntional entities:
 
-- User agent: endpoints, client and servers. 
+- User agent: endpoints, client and servers.
 - Proxy server: routers at application level, can keep state of session transactions
 - Redirect server
 - registar server: service for user registration to the infrastructure
@@ -243,3 +243,49 @@ There are different fucntional entities:
 
 Messages are structured as: start-line, header, message body (optional). If it is a request in the startline there's the name-method, protocol version and the request URI. If it is a REPLY there's protocol version, state code, explicative phrase. the body can contain firther information on flow and service.
 
+## Router Internet
+
+### Best Effort
+
+The routers move packets without differentiating queuing or scheduling and without distinguish between flows.
+
+A router executes for **every packet** that is put into a **FIFO queue**
+
+1. verification destination
+2. check routing tables
+3. select best output path (maximum match length)
+4. Forward the packet
+
+![standard router model](./routing.png)
+
+Standard router doesn't support any QoS.
+
+![internal model of a router](./routing1.png)
+
+The normal standard policy is FIFO, a unique queue for every flow of the router: no service differentiation. *Routers must pass messages ASAP.*
+
+**Law of conservation of work (Kleinrock):** A router (work conservative) cannot be idle if there are packets on any input/output port (delays can't be introduced).
+
+If there are $n$ flows with **$\lambda_n$ traffic** for every flow, and a **service mean time $\mu_n$**, then the **use is $\rho_n=\lambda_n\mu_n$**. Where:
+
+- $\rho_n$ represents the mean usage
+- $q_n$ represents the mean waiting time
+
+The **Kleinrock Law** for work consertative scheduler states: **$\sum \rho_n q_n = C$ constant**.
+
+If the router gives a lower delay/higher bandwidth to a flow, has to increase/reduce it for another one. Cannot favor a flow without damaging another one.
+
+### Router QoS policies
+
+Qos can be obtained by conditioning the traffic: monitoring of the traffic and taking actions to decide more sophisticated policies of services. Cloud be:
+
+- delay some packets
+- discard some packets
+
+![qos router](./routing2.png) 
+
+QoS Router have policies for queuing and scheduling, based on packet, length or destination/source (flows). A router can a packet classifier and a functionfor traffic conditioning.
+
+![traffic conditioner](./routing3.png)
+
+Arrivato a slide 62 (da fare)
