@@ -354,7 +354,7 @@ Max-Min share: requests of different resources by different flows must be consid
 
 ![policies max-min](./policies.png)
 
-The Max-Min model lets pass first the flow that has fewer demanding requests. the scaling down is done only in lack of resources. 
+The Max-Min model lets pass first the flow that has fewer demanding requests. the scaling down is done only in lack of resources.
 
 #### Generalized processor scheduling
 
@@ -363,9 +363,115 @@ Defined some classes for packets (flows), each flows is configured with one weig
 
 This means that the flow $i$ receives at least the rate:
 
-  $R_i= \frac{w_i}{\sum w_j}R$ 
+  $R_i= \frac{w_i}{\sum w_j}R$
 
 It is a very fair policy: given a priority, at the worst case it is respected for each flow, if a flow has an empty queue then the others get is share in an equal way.
 
 > :warning: it is not possible to implement GPS in reality, it is possible only to servce packets, not bits.
+
+#### Round robin policies
+
+Scheduling with priorities: easy to implement, can cause starvation of low priority flows. We split the band in fractions to prevent starvation.
+
+![scheduling with priority](./queues.png)
+
+Round robin visits each flow cyclically and send one packet per flow. If the queue is empty it can't skip it. (nda: on slides it's said that it cloud skip it, but at Lectures we said it clound't skip, idk)
+
+**Weighted Round Robin:** Every queue is visited for every round a number of times equal to the weight. Works worst in vase of short flows.
+
+**Deficit Round Robin:**
+
+- Every flow has a state value (deficit 0).
+- When arriving the top of the queue, the packet is extracted if it is less than a threshold length, otherwise it waits for a number of rounds associated with its length compared with the deficit threshold (by augmenting the deficit fo a specificamount each visit).
+- the packets beyond the threshold waits an appropriate number of turns, proportional to their length.
+Works well when there are a limited number of flows and with small packets on average.
+
+#### Fair Queuing and its variations
+
+GPS principle, as it were per-bit: A packet of a size N in a flow can be output only after visiting all other queues N times, by examining all flows 1 bit at time. If examining 1 bit at time we reach an end of packet, then it is extracted from the queue.
+
+**FAIR QUEUING**: is the more suitable policy and simple to implement, and it is typically available on all routers even low-cost. The packets firsts to exit are the ones "that ends first". *Example with flows all the same weight:*
+![GPS with packets](./queues1.png)
+
+Fair queuing is a fair policy that also favors an optimal usage of router resources.
+
+### Congestion Prevention
+
+The main problem with QoS routers is **not knowing the incoming traffic in advance**. Solution: when possible, we insert the state inside the system to forecast the flow arrival.
+
+One of the most unpleasant situation in best-effort systems is congestion. Often dealt with simple and reactive policies:
+
+- Discard only excess packets (silently)
+- Send indication to limit traffic (choke packets)
+
+In QoS internet is possible to undertake congestion with preventive actions.
+
+#### Proactive Policies Red
+
+**Random Early Detection**: a queue for every flow with equal priority.
+
+Congestion prevention with a random discarding of packets in every queue, even much earlier than the congestion situation.
+
+RED defines the min, max and avarage length of the queue. In the lenght is under the min takes no action, if it's over the max discards all the new packets, otherwise **discards with probability proportional to queue length**.
+
+The RED policy is successful preventing congestion.
+
+## Internet Services and new Requirements
+
+**Best effort**: no guaranteed throughput, possible delays, no duplication control or action to order guaratees. Good for elastic services like Internet.
+
+**Controlled Load**: similar to best effort with low load, limitations on delay, **elastic services and tolerant real-time**.
+
+**Guaranteed Load**: tight limit to delay, maximum guarantee on flows, real-time non tolerant services.
+
+### Real Time streaming protocol
+
+Web-based streaming transported up to a final client, **Real-player**.
+
+The player commincates with the server via UDP or TCP, trying to obtain a better provisioning and adaptation, by exploitating only a **local receiver buffer strategy.**
+
+The receiver does not wait the entire file to provide the stream, but assumes and keeps a receiver buffer to always contain some frames.
+
+### Internet transition
+
+If tcp is elastic with ordering warranties and flow control, OSI asks QoS at any level. Warranties as a cost. Internet is going from a low-cost low-performance to differentiated cost and performances with 2 suites:
+
+- Integrated Services: working at level 7 and at single flow level
+- Differentiated Services: joining and classifying flows under different qualities, level 3
+
+## IntServ: Integrated services
+
+New protocols to adapt the Internet to obtain a better control on operations and resources, keeping compatibility with IP best-effort policies.
+
+The analysis is done per flow and per hop, without considering scalability too much:
+
+- RSVP: resource reservation setup protocol, signaling, to plan resources
+- RTCP: real-time control protocol, dynamic management, keep negotiated QoS
+- RIP: real-time protocol, General operational messages (UDP)
+
+IntServ must work during both static and dynamic phases to gran QoS. The goal is to produce an active path, connecting the sender and the receiver for the whole flow.
+
+The static actions (out of band) can be expensive, the dynamic actions are time critical.
+
+### RSVP: reservation protocol
+
+- the sender signals itself to the receiver "I'm here", and propose a path
+- the receiver answers back, to find out the best path and book the needed resources on the nodes.
+How to propagate the messages is not part of the protocol. The sender keeps singling itself, even if no one is interested.
+
+RSVP enables resource reservation in the opposite verse. Of course Rsvp uses UDP.
+The nodes all know their neighbor, they communicate to enavle the reservation of needed resources to guarantee an agreed SLA. **This protocol is before the real service flow and is out of band.**
+
+The admitted state is soft and many optimization are possible (shared paths, multiple providers). the implementation is free to decide many decisions, and since it's out of band, also optimal.
+
+![int serve rsvp](./intserv.png)
+
+Summary:
+
+- Single-hop protocol
+- The only goal is to signal information to reserve necessary resources
+- Produces state on every node of the path
+- Sharing of active path in various forms.
+- RSVP is not a routing protocol, but must be compatible with them (ipv4 and ipv6)
+
 
