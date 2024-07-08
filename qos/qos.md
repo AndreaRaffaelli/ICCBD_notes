@@ -449,9 +449,10 @@ The analysis is done per flow and per hop, without considering scalability too m
 - RTCP: real-time control protocol, dynamic management, keep negotiated QoS
 - RIP: real-time protocol, General operational messages (UDP)
 
-IntServ must work during both static and dynamic phases to gran QoS. The goal is to produce an active path, connecting the sender and the receiver for the whole flow.
+IntServ must work during both static and dynamic phases to grant QoS. The goal is to produce an active path, connecting the sender and the receiver for the whole flow.
 
 The static actions (out of band) can be expensive, the dynamic actions are time critical.
+> Note that IntServ is not very much scalable since requires negotiation node per node to reserve resources and to provision the flows.
 
 ### RSVP: reservation protocol
 
@@ -460,7 +461,7 @@ The static actions (out of band) can be expensive, the dynamic actions are time 
 How to propagate the messages is not part of the protocol. The sender keeps singling itself, even if no one is interested.
 
 RSVP enables resource reservation in the opposite verse. Of course Rsvp uses UDP.
-The nodes all know their neighbor, they communicate to enavle the reservation of needed resources to guarantee an agreed SLA. **This protocol is before the real service flow and is out of band.**
+The nodes all know their neighbor, they communicate to enable the reservation of needed resources to guarantee an agreed SLA. **This protocol is before the real service flow and is out of band.**
 
 The admitted state is soft and many optimization are possible (shared paths, multiple providers). the implementation is free to decide many decisions, and since it's out of band, also optimal.
 
@@ -474,4 +475,48 @@ Summary:
 - Sharing of active path in various forms.
 - RSVP is not a routing protocol, but must be compatible with them (ipv4 and ipv6)
 
+### RTP: Real-time transport protocol
 
+Active role for both **sender** and **mixers** that can actively work on the procotol. The mediators can add information to the data with timestamps toward SLA monitoring
+
+The active path become a set of sources for every node in the active path: Shared paths, that can produce more complex graphs, with nodes belonging to more paths.
+
+**Works form sender to receiver**. Uses UDP as transport protocol.
+
+### RTCP: Real-time transport control protocol
+
+Global and concise information of flow control at application level.
+
+- Control messages are sent using the same resources of the traffic provisioning (in band)
+- **RTPC messages travels both directions.**
+
+Gives information on packets (loss, delay, jitter), on end system (users), application.
+
+RTCP is for flows management with QoS and only to transport control infromation for the current flow engaged by RTP.
+
+RTCP is limited in intrusion: 5-10% of RTP.
+
+## Differentiated services
+
+Differentiate flows in classes easy to be managed. They achieve greater scalability. Differentiated services are very domain specific to user community.
+
+DiffServs do not work for each information flow separately, but they aggregate network level classes of flows. The massages of flows are marked at the network layer, not at application level (IntServ).
+
+Different Service class cloud be:
+
+- Gold: 70% bandwidth
+- Silver: 20% bandwidth
+- Bronze: 10% bandwidth
+
+otherwise:
+
+- Premium, low delay
+- assured, high speed and low packet loss
+
+Can define SLA based on classification.
+
+### DiffServ and IntServ together
+
+Two multicast protocols are difficult to integrate together. If two area of the Internet are working with different protocols a layer of conversion is needed.
+
+If DiffServ can appear more scalable, IntServ can guarantee a better control on QoS.
