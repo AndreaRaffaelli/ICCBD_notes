@@ -282,10 +282,90 @@ Qos can be obtained by conditioning the traffic: monitoring of the traffic and t
 - delay some packets
 - discard some packets
 
-![qos router](./routing2.png) 
+![qos router](./routing2.png)
 
 QoS Routers have policies for queuing and scheduling, based on packet, length or destination/source (flows). A router can have a packet classifier and a function for traffic conditioning.
 
 ![traffic conditioner](./routing3.png)
 
-Arrivato a slide 62 (da fare)
+How to intervene on routing to obtain respect of some SLAs? By marking every datagram and acting on it.
+
+Traffic management is typically provided by intermediate router nodes. They must consider different flows to maintain the QoS:
+
+- Routers must keep the **State to differentiate flows**
+- Routers must make **queue managements activities**
+
+### Models for QoS routers
+
+QoS routers are non Internet complaint because **they don't respect the Kleinrock Law**.
+
+- Leaky Bucket: the router has a limited memory for messages and some limits in output
+- Token Bucket: the router is only delaying messages, that must kept into the memory waiting to get out.
+
+The bucket models: control flows through capacity. **The policy is still best-effort**:
+
+- If packets arrive to quickly they are dalayed
+- If packets arrivie in execess they are thrown away or lost.
+
+#### Leaky Bucket
+
+The router must know the flows and possible service capacity. The router ACTIVELY shpaes services with the strategy of limiting output flows.(A bucket per flow).
+![leaky bucket](./routing4.png)
+
+Leaky bucket aims at **switching off packets bursts**. A packet is queued only there's space in the bucket. The packets can exit with a maximum speed $R$ that limits the allowed input flow $r,(r>R)$
+
+#### Token Bucket
+
+Token bucket considers flows history via tokens as authorization for passing.
+
+- Empty bucket: not pass and wait
+- Full bucket: tokens can be associated with packets to pass
+- Partially full: some messages can pass, others have to wait
+
+![token bucket](./routing5.png)
+
+Token bucket allows packets bursts: if data arrives too quickly, beyond the admissible output flow, **they can exit when enough corresponding tokens are accumulated.**
+
+![token production](./routing6.png)
+
+The token imposes delay to **grant a requested buffered resources**.
+
+![token effects](./routing7.png)
+
+Often the two buckets are used in serial chain.
+
+### Policies of QoS routers
+
+While Internet routers are FIFO, respecting Kleinrock Law, **Qos Routers** don't: they **must penalize someone to give priority**. How?
+
+Scheduling and queueing must respect properties:
+
+- Implementation ease
+- Fairness: any flow must be penalized the same as any other
+
+#### General fair strategy: MAX-MIN
+
+Max-Min share: requests of different resources by different flows must be considered in order of growing requests. (First the ones that require less)
+
+- $C$ global max capacity of resources
+- $X_n$ resources request by flow-n
+- $m_n$ previously allocated resources to flow-n
+- $M_n$ available resources for flow-n
+
+![policies max-min](./policies.png)
+
+The Max-Min model lets pass first the flow that has fewer demanding requests. the scaling down is done only in lack of resources. 
+
+#### Generalized processor scheduling
+
+Defined some classes for packets (flows), each flows is configured with one weight $w_i$. The GPS ensures that the flow $i$ in the interval $(s,t]$, if the queue is never empty, then this relation is always true: $w_j O_i(s,t) >= w_i O_j(s,t)$.
+> $O_k(s,t)$ is the amount of bits for the flow $k$ on the interval $(s,t]$.
+
+This means that the flow $i$ receives at least the rate:
+
+  $R_i= \frac{w_i}{\sum w_j}R$ 
+
+It is a very fair policy: given a priority, at the worst case it is respected for each flow, if a flow has an empty queue then the others get is share in an equal way.
+
+> :warning: it is not possible to implement GPS in reality, it is possible only to servce packets, not bits.
+
