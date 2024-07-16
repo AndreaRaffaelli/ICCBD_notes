@@ -183,5 +183,4 @@ The gossip procotocol is made of messages with the goal of consistency, a kind o
 
 ![vector clock](./cassandra6.png)
 
-It's critical, but can't be expensive. Uses a simple heartbeat, suspicion mechanism to adaptibely set the timeout based on underlying network and failure behavior. Each members calculate his own Phi, which is the inter-arrival times for gossip messages. Generally, $\phi=5 \rightarrow 10-15 s$ detection time.
-
+It's critical, but can't be expensive. Uses a simple heartbeat, suspicion mechanism to adaptively set the timeout based on underlying networkgit and failure behavior. Each members calculate his own Phi, which is the inter-arrival times for gossip messages. Generally, $\phi=5 \rightarrow 10-15 s$ detection time.
