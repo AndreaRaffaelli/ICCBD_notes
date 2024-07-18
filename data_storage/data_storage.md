@@ -183,4 +183,92 @@ The gossip procotocol is made of messages with the goal of consistency, a kind o
 
 ![vector clock](./cassandra6.png)
 
-It's critical, but can't be expensive. Uses a simple heartbeat, suspicion mechanism to adaptively set the timeout based on underlying networkgit and failure behavior. Each members calculate his own Phi, which is the inter-arrival times for gossip messages. Generally, $\phi=5 \rightarrow 10-15 s$ detection time.
+It's critical, but can't be expensive. Uses a simple heartbeat, suspicion mechanism to adaptively set the timeout based on underlying network and failure behavior. Each members calculate his own **Phi, which is the inter-arrival times for gossip messages.** Generally, $\phi=5 \rightarrow 10-15 s$ detection time.
+
+### Consistency levels for Cassandra
+
+Client is allowed to choose a consistency level for each operation (read/write).
+
+- **ANY: any server** (might not be replica). Fast: coordinator caches write and replies quickly to client
+- **ALL: all replicas**. Ensures strong consistency, but slowest.
+- **ONE: at least one replica**. FASTEST, but cannot tolerate a failure.
+- **QUORUM: quorum across all replicas** in all DCs.
+
+The quorum can be different form reads and writes.
+
+### Standard Quorum
+
+Each read or write can have a quorum, (depends on the coordinator). A quorum involves >50% nodes agreeing on something, these means that 2 consecutive quorum must have a common node: **this ensures quorum consistency**.
+![quorum](./cassandra7.png)
+
+In blue there is a write quorum, in red a read quorum: at least one node returns latest write. **Quorum is faster than ALL**, but still ensure strong consistency.
+
+### Tuned quorum
+
+$R =$ read replica count, $W =$ write replica count, $N =$ vnodes
+
+1. $W+R>N$
+2. $W>N/2$
+
+Select value based on use cases:
+
+- $(W=1, R=1)$ very few writes and reads
+- $(W=N, R=1)$ great for read-heavy workloads
+- $(W=N/2 +1, R=N/2 +1)$ great for write-heavy workloads
+- $(W=1, R=N)$ great for write-heavy workloads with one client writing per key
+
+Other two consistency levels:
+
+- Local quorum: quorum in the coordinator DC. Faster than quorum
+- Each quorum: each DC does his quorum, then a hierarchical quorum
+
+### Final consideration on cassandra
+
+Cassandra follows users from novice to ecperts letting tuning the parameters to every single key. Cassandra is both key-value store and Cloumn oriented.
+
+## MongoDB
+
+Documento store DB, they define a xml/json/proprietary format fo documents. Heavy configuration out of band, very fast in band. As many others is based on shards,
+
+Mongo has a distributed architecture: a router, the access point, tells you where to find data. Collection partitioning using shard key: hash-based to obtain a balanced distribution (not granted).
+
+![mongo arch](./mongo1.png)
+
+Architecture:
+
+- Router to accept and route incoming request coordinating with config server
+- Shard, data store
+
+Mongo automatically balance shards.
+
+### Replication
+
+The configuration can grant different properties:
+
+- Several routers to accept incoming requests
+- Config servers to give access to routers
+
+The system is capable of supporting dynamic access to documents.
+
+Mongo uses BSON, binary Json, reminds of RDBMS.
+![mongo replication](./mongo1.png)
+
+Leader election protocol elects a master. Some nodes dont maintain data, but can vote, as arbiters
+
+![mongo replication](./mongo2.png)
+
+### Read preferencies
+
+- Primary preferred
+- secondary
+- **nearest**: helps reduce latency, improve throughput, reads from secondary may fetch stale data.
+
+### Write concerns
+
+Whic guarantee that mongoDB provides on the success of a write operation? Acknowledged., primary returns answers immediately.
+Other options are:
+
+- journal
+- replica acknowledge (with quorum)
+Weaker writes implies faster write time.
+
