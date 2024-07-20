@@ -144,3 +144,71 @@ Multi-stage and interactive apps require **faster data sharing** across parallel
 
 - Removes the MapReduce overhead of writing intermediate results on disk
 - Fault-tolerance is still achieved through the concept of **lineage**
+
+Spark adopts Master/worker model.
+
+### Spark Model vs MapReduce Model
+
+![Map reduce model](./mapreduce5.png)
+
+![Spark model ](./spark1.png)
+
+Key idea: Resilient Distributed Datasets (RDDs)
+
+### RDDS
+
+- Mantained in memory
+- distributed, immutable collections of objects
+- Can be cahced in memory across cluster nodes
+
+Spark works on RDDs with **transformation and actions**:  
+
+- Transformation: operation performed on RDDs that are lazily evaluated, create a new RDDs.
+- Actions return results form RDDs force immetiate evaluation of pending transformations.
+
+A lineage tracks operations and RDDs dependencies, mostly represented with graphs.
+
+Since transformation are lazily evaluated, each time are computed again on every action requested.
+
+```kotlin
+val lines = sc.textFile("data.txt") 
+val lineLengths = lines.map(s => s.length)
+val totalLenght = lineLengths.reduce((a, b) => a + b)
+```
+
+The `reduce()` will force a read from the text file and the `map()` transformation.
+
+``` kotlin
+val lines = sc.textFi1e("data.txt:) 
+val lineLengths = lines.map(s => s.length)
+println(lineLengths.count( ) ) 
+val totalLength = lineLengths.reduce( (a, b) => a + b) 
+```
+
+There are 2 actions, which will force 2 identical computation of `map()`. That effect is expensive, but can be avoided by using the `persist()` method: 
+
+``` kotlin
+val lines = sc.textFi1e("data. txt")
+val lineLengths = lines.map(s => s.length)
+lineLengths.persist( )
+```
+
+The RDD data read and mapped are saved for future actions.
+
+Once submitted spak prograns create ***directed acyclic graphs*** of all transformations and acrions. The graph is then **split in stages**, composed by **tasks**, the smallest unit of work. 
+
+### Spark architecture
+
+The spark support us master/worker system composed by:
+
+- Driver: node running `main()` method dispatching tasks
+- Cluster Master: launches and manages actual executors
+- Executors, responsible for running tasks.
+
+![spark architecture](./spark2.png)
+
+Each executor spawns at least one dedicated JVM, to which a certain share of resources is assigned: number of jvms can be customized.
+
+Spark can be deployed in a standalone cluster, which launches independently its executors, or can rely upone external resource managers like YARN or MESOS, which can provide richier functionalities like scheduling queues.
+
+Spark can produce very large results, necessities of NoSQL repositories.

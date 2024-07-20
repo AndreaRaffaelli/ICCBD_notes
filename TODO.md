@@ -1,8 +1,8 @@
 # TODO:
 
-- [ ] Docker
+- [ ] Docker and kubernetes
 - [ ] Openstack
-- [ ] Datastream
+- [x] Datastream
 - [ ] serverless
 - [ ] deploy elasticsearch
 - [ ] Nosql graphs
