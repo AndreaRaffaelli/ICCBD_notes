@@ -228,7 +228,7 @@ Cassandra follows users from novice to ecperts letting tuning the parameters to 
 
 ## MongoDB
 
-Documento store DB, they define a xml/json/proprietary format fo documents. Heavy configuration out of band, very fast in band. As many others is based on shards,
+Document store DB, they define a xml/json/proprietary format for documents. Heavy configuration out of band, very fast in band. As many others is based on shards.
 
 Mongo has a distributed architecture: a router, the access point, tells you where to find data. Collection partitioning using shard key: hash-based to obtain a balanced distribution (not granted).
 
@@ -239,7 +239,7 @@ Architecture:
 - Router to accept and route incoming request coordinating with config server
 - Shard, data store
 
-Mongo automatically balance shards.
+Mongo automatically balance shards (migrates chunks of shards if there's uneven distribution).
 
 ### Replication
 
@@ -251,24 +251,24 @@ The configuration can grant different properties:
 The system is capable of supporting dynamic access to documents.
 
 Mongo uses BSON, binary Json, reminds of RDBMS.
-![mongo replication](./mongo1.png)
+
+![mongo replication](./mongi2.png)
 
 Leader election protocol elects a master. Some nodes dont maintain data, but can vote, as arbiters
 
 ![mongo replication](./mongo2.png)
 
-### Read preferencies
+### Read preferencies/policies
 
 - Primary preferred
-- secondary
+- Secondary
 - **nearest**: helps reduce latency, improve throughput, reads from secondary may fetch stale data.
 
 ### Write concerns
 
-Whic guarantee that mongoDB provides on the success of a write operation? Acknowledged., primary returns answers immediately.
-Other options are:
+Which guarantees does mongoDB provide on the success of a write operation? 
 
-- journal
-- replica acknowledge (with quorum)
-Weaker writes implies faster write time.
+On a write operation, the client can specify the write concern, which is the level of acknowledgment requested from the server. The write concern can specify how many `mongod` must acknowledge the write, if the write must be written to the journal (of the primary) and a timeout to avoid indefinite blocking.
+
+Weaker writes concerns implies faster write time.
 
