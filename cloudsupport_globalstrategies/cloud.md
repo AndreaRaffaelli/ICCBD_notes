@@ -2,7 +2,7 @@
 
 ## Coud data center
 
-The cloud means a big data cneter, federated with others capable of giving good and fast answers to user.
+The cloud means a big data center, federated with others capable of giving good and fast answers to user.
 
 Requirements of a DC:
 

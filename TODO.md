@@ -1,9 +1,9 @@
 # TODO:
 
-- [ ] Docker and kubernetes
-- [ ] Openstack
+- [x] Docker and kubernetes
+- [x] Openstack
 - [x] Datastream
-- [ ] serverless
+- [x] serverless
 - [ ] deploy elasticsearch
 - [ ] Nosql graphs
 - [ ] Revise SNMP and RMON

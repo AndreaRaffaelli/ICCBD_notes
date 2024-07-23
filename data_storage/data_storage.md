@@ -93,7 +93,7 @@ Cassandra is well oranized in a core hierarchyof concepts that constitute the bo
 
 ![cassandra hierarchy](./cassandra2.webp)
 
-Cassandra target is to reach **$120\%$ of utilization**.
+Cassandra target is to reach **$120 \%$ of utilization**.
 
 Cassandra **maps virtual nodes in a ring** on a Node (server), a partition is the basic data unit replicated on virtual nodes. They are controlled by the partitioner.
 
@@ -199,6 +199,7 @@ The quorum can be different form reads and writes.
 ### Standard Quorum
 
 Each read or write can have a quorum, (depends on the coordinator). A quorum involves >50% nodes agreeing on something, these means that 2 consecutive quorum must have a common node: **this ensures quorum consistency**.
+
 ![quorum](./cassandra7.png)
 
 In blue there is a write quorum, in red a read quorum: at least one node returns latest write. **Quorum is faster than ALL**, but still ensure strong consistency.

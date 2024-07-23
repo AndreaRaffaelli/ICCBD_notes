@@ -41,7 +41,7 @@ consider their synchronization):
 
 #### Reliable Multicast
 
-Can be achived is:
+Can be achived if:
 
 - No sender crash
 - No receiver crash
@@ -57,22 +57,23 @@ The support introduces:
 
 #### Atomicity vs No ordering
 
-**atomicity**: we focus on the reception order of messages by any alive members of the group.
+**Atomicity**: we focus on the reception order of messages by any alive members of the group.
 **No order**: all receivers can present a different ordering in any copy.
 No ordering poolicy is very easy to support.
 
-### ordering
+### Ordering
 
-- fifo ordering: messages received same order in which are sent from the group.
+- fifo ordering: messages received **same order in which are sent** from the group.
 - cause-effect ordering: **Received in the same order they where caused** (then sended). two different servers send 2 messages, the messages must arrive in the order they where caused.  
+- total ordering: **All the messages are received in the same order by all the group members**. The order is the same for all the members, but not necessarily the same as the sending order, causal-effect or fifo.
 
-> (m1 and m2 from S1), (m3 and m4 from S2), **(m1 causes m3)**. Possible arriving order:
+> **Causal ordering example:** (m1 and m2 from S1), (m3 and m4 from S2), **(m1 causes m3)**. Possible arriving order:
     - (m1 m2 m3 m4)
     - (m1 m3 m2 m4)
     - (m1 m3 m4 m2)
     - NOT m3 m1 m4 m2
 
-#### Atomic ordering
+#### Atomic ordering (total ordering)
 
 **ATOMIC ordering guarantees that all messages are received in the same order by all group members.**
 Impossible to forecast any order, but is important to dinamically agree on one and should be the same for all.
@@ -82,7 +83,7 @@ The enforcing of orderings is expensive.
 - Fifo and causal: **Partial orderings**
 - Atomic: Total ordering
 
-Atomic ordering can follow anyway a causal and/or fifo policy. Cost for atomic ordering can be very different.
+Atomic ordering can follow anyway a causal and/or fifo policy. Cost for atomic ordering can be very different. An example of atomic broadcast is Zookeper AB.
 
 ![messages timeline](./multicast1.png)
 
@@ -232,7 +233,7 @@ We **exclude fixed priorities that are unfair and can cause starvation**
 
 - Approach completely centralized considers a unique coordinator process
 - Every process sends the request to the coordinator and after usage, notifies it
-- Coordinator must geant mutual exclusion
+- Coordinator must grant mutual exclusion
 
 The coordinator can decide different policies (fifo, ecc).
 
