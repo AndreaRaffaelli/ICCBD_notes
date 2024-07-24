@@ -81,7 +81,7 @@ Availability and reliability:
 
 **Reliability**: probability of an available service depending of the time and based on a period delta-T
 
-    R(0) = A, R(delta-T) = reliable over time delta-T
+    $R(0) = A, R(\Delta T) =$ reliable over time $\Delta T$
 
 - **Correctness** = Safety -> **Reliability**
 
@@ -91,22 +91,22 @@ To tolerate occurring faults a system must grant **safety and liveness. To grant
 
 ### Type of Replication
 
-1. Passive copies: only one compunent executes, the others are as backup
-2. Acrive copies: All components are equal in role, execute the same operation to produce a coordinated unique result. (Max throughput in a cluster of processors)
+1. Passive copies: only one component executes, the others are as backup
+2. Active copies: All components are equal in role, execute the same operation to produce a coordinated unique result. (Max throughput in a cluster of processors)
 
 #### Examples: Stable Memory
 
 Stable memory uses replication. Limiting fault assumption: probability of multiple faults over related memory components.  **single fault assumption**
 Any error is converted to an **omission**.  
 Blocks are organized in two different copies. (**replication degree is two**)
-Any operation operates on both copies (**active**), whren any action comes to an incorrent block it is considered an omission and **starts a recovery protocol**.
+Any operation operates on both copies (**active**), when any action comes to an incorret block it is considered an omission and **starts a recovery protocol**.
 
 - If one copy is correct, the protocol copies the value.
 - If the 2 copies are correct but inconsistent, One content is enforced.
 
 #### Examples: Tandem
 
-It's a special purpose architecture (banks). It has a replication level two for every systek component. Its a fail-safe system, dependable with single fault assumption.
+It's a special purpose architecture (banks). It has a replication level two for every system component. Its a fail-safe system, dependable with single fault assumption.
 ![total replication in TANDEM](./replication2.png)
 
 #### Examples: RAIDS
@@ -130,7 +130,7 @@ Fault tolerance requires support, protocol and resources:
 - Complex algorithm
 - Complex implementations
 
-Recovery procols myst be more reliable than the application itself.
+Recovery procols must be more reliable than the application itself.
 
 - Special purpose -> ad-hoc resources with even better QoS (avionic)
 - General purpose -> fault tolerance support insistes on user resources

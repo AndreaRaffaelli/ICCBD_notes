@@ -17,22 +17,17 @@ Semantic of sending to many receiver. What does it mean the sending succed:
 - Most received?
 - All received?
 
-Do I have to wait all the acks?
-
-I can have several sender in a group.
+Do I have to wait all the acks? I can have several sender in a group.
 
 ![multicast](./multicast.png)
 
-What does reliability mean in a mutlicast: in this case means you want to recover omission.
+#### Group memebers reception semantic
 
-Group memebers reception
+- **reliable** -> guaranteed delivery. (with resending)
+- **unreliable** -> only 1 attempt (chorus), Leaving the duty to the other members of the group to propagate.
+- **Atomicity**: in the group means that the scheduling/ordering inside the group is the same for all the members.
 
-- reliable -> guaranteed delivery. (with resending)
-- unreliable -> only 1 attempt (chorus), Leaving the duty to the other members of the group to propagate.
-
-**Atomicity**: in the group means that the scheduling/ordering inside the group is the same for all the members.
-
-Essential Element
+Essential Element:
 We must think not only to the semantics of a single action, but
 also to message ordering in a multiple action occurrence (and
 consider their synchronization):
@@ -93,19 +88,19 @@ Atomic ordering can follow anyway a causal and/or fifo policy. Cost for atomic o
 - Causal multicast: causal ordering
 - **Lamport ordering**
 
-Simple way to implement atomic orderd for messages comiing from the outern: **one node becomes also the entry element, front end**. This solution comes with withdraws:
+Simple way to implement atomic orderd for messages comiing from the outern: **one node becomes also the entry element, front end**. This solution comes with drawbacks:
 
 - SPoF
 - Unfair management: outern neighbors can be favored. **Low cost but unfair.**
 
 Alternative: mobile co-ordinator with a **Cirtulating token**
 
-#### how to achieve synchronization
+#### How to achieve synchronization
 
-synchronization: Ordering on events. Provide a consistent view of the system to the
-entire set of communicating processes.
-Synchronization by using PHYSICAL TIME and PHYSICAL CLOCK – typical on one local environment only, **absolutely not feasible on distributed and global system**.
-Enter UCT, universal coordinated time. NTP is the synchronization protocol able to achieve an agreement on physical clock. Uses a server hierarchy with a small numbers on level to provide clock with small errors. Still remains **hard to avoid conflicts and clock drifting with limited overhead**.
+Synchronization: Ordering on events. Provide a consistent view of the system to the entire set of communicating processes.
+Synchronization by using **physical time** and **physical clock** it's typical on one local environment only, **absolutely not feasible on distributed and global system**.
+
+Enter UCT, the universal coordinated time. NTP is the synchronization protocol able to achieve an agreement on physical clock. Uses a server hierarchy with a small numbers on level to provide clock with small errors. Still remains **hard to avoid conflicts and clock drifting with limited overhead**.
 
 Several Distributed Synchronization Methods: discrete time and ordering of a event subset:
 
@@ -130,7 +125,9 @@ Consider events caused by a set of processes that communicate through message pa
 - If a is the sending event in one process and b is the receiving event within another process, then $a \rightarrow b$ (communication interprocess)
 - If $a \rightarrow b$ and $b \rightarrow c$, then $a \rightarrow c$ (transitivity)
 
-The relation -> introduce a partial ordering in some systems events and among all events, **it's not a total ordering)**. Two events are concurrent $\uparrow\uparrow$ if **not $a \rightarrow b$ and not $b \rightarrow a$**
+The relation $\rightarrow$ introduce a partial ordering in some systems events and among all events, **it's not a total ordering**. Two events are concurrent ( $\uparrow\uparrow$ ) if **not $a \rightarrow b$ and not $b \rightarrow a$**.
+
+> :warning: Total ordering is a different thing: **T.O. means each node agrees on the same order of events**. "Happened before" is a partial ordering and wants to define a causal-effect ordering.
 
 ![events flow diagram](./lamport1.png)
 
@@ -146,17 +143,17 @@ Define $TS(i)$ as the timestamp of the event i:
 
 - if $a \rightarrow b$, then $TS(a) < TS(b)$.
 
-We can then define the **clock conditions LC**:
+We can then define the **clock condition LC** (which defines the timestamp $TS$ for an event taking into account the $\rightarrow$ relationship):
 
 - C1: Given a and b, if $a \rightarrow b$ then $LC(a) < LC(b)$
 
     > Note: It is not true that if $LC(a) < LC(b)$ then $a \rightarrow b$
 
-- C2: For $\forall a$ and $\forall b$, if $a$ is the sending of a message in the process P_i and $b$ the reception in the process P_j, then $LC(A) < LC(b).$
+- C2: For $\forall a$ and $\forall b$, if $a$ is the sending of a message in the process $P_i$ and $b$ the reception in the process $P_j$, then $LC(A) < LC(b).$
 
 Implementation Practices:
 
-- Every Process P_i increments LC_i between any two events
+- Every Process $P_i$ increments $LC_i$ between any two events
 - For $\forall a$, sending of a message in a process, the message contains a clock as timestamp $TS=LC(a)$
 - For $\forall b$, reception of a message in process Pj, the process put the logical clock at the greater value between current clock and timestamp $LC_j = max( TS_r, LC_c ) + 1$ _(r received, c current)_
 
@@ -190,7 +187,7 @@ Total ordering assumes ther is an order between all processes.
 
 ## Vector Clock Ordering
 
-Consider a vector of logical clocks (Vector CLocks) to roder events in a process set.
+Consider a vector of logical clocks (Vector clocks) to order events in a process set.
 
 Processes must maintain a vector of all known clocks of processes and use that in communication.
 
@@ -201,12 +198,12 @@ the process i in the vector keeps:
 1. `Vi[i]` its timestamp
 2. `Vi[k]` the timestamp of any other process Pk at its knowledge
 
-So the data structure is more ccomplex for processes and also for the protocol to communicate and update the vector.
+So the data structure is more complex for processes and also for the protocol to communicate and update the vector.
 
 ### Vector clock protocol
 
 1. Every process Pi increments `Vi[i]` between two events
-2. For $\forall$ sending of a message, the message contains the while vector clock (after incrementing its own entry)
+2. For $\forall$ sending of a message, the message contains the whole vector clock (after incrementing its own entry)
 3. For $\forall$ reception of a message Pj increments its own `Vj[j]=Vj[j]+1` and updates its vector according to `Vj[k] = max(Vi[k], Vj[k])`
 
 This protocol permits a wider iformation propagation and permits a wider information exchange and diffusion.
@@ -217,19 +214,21 @@ In the vector clock algorithm cuncurrent events can't be recognized as sequentia
 
 ![vector clock](./lamport4.png)
 
-## synchronization
+## Synchronization
 
-Scenario: Access a resource ina mutually exclusive way
+Scenario: Access a resource in a mutually exclusive way
 
 Objectives:
 
-- Safety: Only one process at a time can havev access to the resource
+- Safety: Only one process at a time can have access to the resource
 - Liveness: Every process that has done a request the access after a limited delay
-- Fairness: fair policy
+- Fairness: Each process get a chance to access the resource
+
+> :question: Difference between liveness and fairness: liveness is a guarantee of access, fairness is a guarantee of access to all processes.
 
 We **exclude fixed priorities that are unfair and can cause starvation**
 
-### single coordinator process
+### Single coordinator process
 
 - Approach completely centralized considers a unique coordinator process
 - Every process sends the request to the coordinator and after usage, notifies it
@@ -243,7 +242,7 @@ The coordinator can decide different policies (fifo, ecc).
 2. Coordinator collect the requests and decide to which one reply to.
 3. The user of resource must send a release message to the coordinator
 
-**3 messages for every access to the critical section.** Disavdvantages stemming fron the centralized and uniquerole of the coordinator.
+**3 messages for every access to the critical section.** Disavdvantages stemming fron the centralized and unique role of the coordinator.
 
 - Spof
 - Potential unfairness
@@ -256,7 +255,7 @@ The local queu initially contains the message `T0:P0`, lesser than every clock i
 
 Every process must know any other one and faults are not expected (**static group**)
 
-#### Protocol
+#### Synch protocol
 
 1. Pi sends the request message `Tm:Pi` to every process (even its queue)
 2. At reception Pj sends a reply with its updated timestamp (Lamport $\Rightarrow$)
@@ -264,13 +263,13 @@ Every process must know any other one and faults are not expected (**static grou
    1. `Tm:Pi` ordered before any other request
    2. It has in queue a message from any other process with a timestamp successive to `Tm:Pi`
 4. Uses the resource and then sends a release message with its timestamp to every process
-5. Pj receives the release request and remover the request message form its queue
+5. Pj receives the release request and remove the request message form its queue
 
 Every process queue is ordered and so a process can pass only when 'previous' request have been served already. Ties are solved through the index number of the processes.
 
 $(N-1)$ messages sent and $(N-1)$ received before entering the critical section. $(N-1)$ to exit. Number of messages: $3(N-1)$ or $(N-1)$ and 2 broadcasts. **High cost** due decentralization. **heavy assumptions on the static group and no faults**.
 
-### richard agrawala protocol
+### Richard Agrawala protocol
 
 1. Pi sends the request message `Tm:Pi` to any process (also his queue)
 2. At reception Pj sends:
@@ -278,18 +277,18 @@ $(N-1)$ messages sent and $(N-1)$ received before entering the critical section.
    - Delay its reply if it is using the resource or it has already asked to enter and has a higher priority
 3. Pi access the resource only is receives $N-1$ approval messages
 4. At release Pi must send approval to all arrived requests
-5. Reuqests and replies are deleted after approval
+5. Requests and replies are deleted after approval
 
 One process can have N-1 approval responses and only process can access the resources at a time.
 
-**Number of exechanged messages:** $2(N-1)$. Difficult to foresee a coordination at a lower cost. **Heavy assumption**: Messages not loast and a static group wothout faults.
+**Number of exechanged messages:** $2(N-1)$. Difficult to foresee a coordination at a lower cost. **Heavy assumption**: Messages not lost and a static group without faults.
 
 ## Atomic Multicast
 
 Atomic multicast: Every process sees the same order of the messages.
 
 - Centralized: unique coordinator
-- Decentralized: CATOCS (CAsual & TOtally Ordere Communication operation support) based on by-neeed dynamic coordination
+- Decentralized: CATOCS (CAsual & TOtally Order Communication Operation Support) based on by-neeed dynamic coordination
 
 ### CATOCS
 
@@ -297,7 +296,7 @@ It is possible to have a manager selected for every request that negotiates with
 
 ### ISIS
 
-Isis atomic broadcast costs $3(N-1)$. The messages are tagged with an initial arriving timestamp and are only considered if labeled as final in the right order for Lmaport relationship.
+Isis atomic broadcast costs $3(N-1)$. The messages are tagged with an initial arriving timestamp and are only considered if labeled as final in the right order for Lamport relationship.
 
 Every arrived message request a coordination phase of the manager to determine the final timestamp to be used by all copies to execute in the correct order.
 
@@ -340,7 +339,7 @@ Who has the token manages the Mutually exclusive resources for all the nodes. Th
 
 ### Ring recovery
 
-very simple revcovery algorithmin case of single fault with no token problem: in csaue of nighbor failure recreate the ring.
+very simple revcovery algorithmin case of single fault with no token problem: in case of neighbor failure recreate the ring.
 
 ![token ring](./lamport5.png)
 
@@ -452,7 +451,11 @@ When a  process closes the recording for all the input channels, it has complete
 The global state snapshot result composed by:
 
 - local states of every process
-- state of input connec channels
+- state of input connect channels
+
+#### Recovery form a Snapshot
+
+A node loads the internal state saved at the start of the recording and then replays all the messages saved from the input channels.
 
 #### How and where are recorder all the states?
 

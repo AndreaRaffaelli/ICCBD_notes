@@ -31,6 +31,13 @@ a process is the representation of a running program. Unix isolate by default me
 
 Docker is a container engine that enables configuration, deployment and lifecycle management.
 
+The 4 most useful properties introduced by docker container are:
+
+- **Isolation**: each container has its own filesystem, network, and process space. Shares only kernel resources.
+- **Reproducibility**/**Portability**/**Ease of migration**: self-contained, no dependencies, no conflicts.
+- **Fine resource constraint management**/**Lightweight**
+- **Immutability**/**Ephemeral**: the container is a read-only filesystem, the state is stored in an external volume.
+
 ### Lifecycle management
 
 ![lifecycle](./lifecycle.png)
