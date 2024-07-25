@@ -76,7 +76,9 @@ The enforcing of orderings is expensive.
 
 - Minimun cost: no ordering
 - Fifo and causal: **Partial orderings**
-- Atomic: Total ordering
+  - Fifo: messages coming from the same sender comes ordered
+  - Causal: messages related from causal-effect relationship are ordered
+- Atomic: Total orderingq
 
 Atomic ordering can follow anyway a causal and/or fifo policy. Cost for atomic ordering can be very different. An example of atomic broadcast is Zookeper AB.
 
@@ -305,8 +307,9 @@ A group should be able of operating with all the ordering policies for any reque
 The coordinator receives the message:
 
 1. Labels it and sends it (with its timestamp) to all others, Anyone else labels the answer with its timestamp
-2. Labels it as final with the recived highest timestamp (Is it necessary?)
-3. resends the message with the final timestamp to all others to communicate the final decision
+2. Labels it as final with the recived highest timestamp
+  **Is it necessary?** In normal situation the manager can decide the final timestamp, which is the highest one, but in case of faults it cloud decide for a lower timestamp.
+3. Resends the message with the final timestamp to all others to communicate the final decision  and put it on the queue in the proper order.
 
 Problem: delay and overhead ($3(N-1)$ messages)
 
@@ -330,6 +333,8 @@ If a cause reach the group after processing the effect? Necessity of undo or err
 The group of processes can dynamically change in cardinality, it is possible to join or to leaver the group. Need a new operation for tracking the dynamic behavior of the group. GBCast makes possible to order all Bcast.
 
 Every group member uses a table for other members: is updated by any GBcast
+
+> Read the wikipedia page on how GB and CBcast work. It is heplful for the exam. [ISIS GBcast](https://en.wikipedia.org/wiki/Gbcast)
 
 ## synchronization using tokens
 
